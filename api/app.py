@@ -3,7 +3,7 @@ import pickle
 import pandas as pd
 import traceback
 
-# Import your modules
+
 from src.models.xgboost_model import forecast_xgb
 from src.data.load_data import load_data
 from src.data.preprocess import preprocess
@@ -11,10 +11,10 @@ from src.utils.helpers import fill_missing_dates
 
 app = FastAPI()
 
-# Load trained models
+
 models = pickle.load(open("models.pkl", "rb"))
 
-# Dataset path
+
 DATA_PATH = "data/raw/sales.xlsx"
 
 
@@ -32,9 +32,7 @@ def forecast(state: str):
 
     model = models[state]
 
-    # =========================
-    # TRY ARIMA
-    # =========================
+
     try:
         preds = model.forecast(steps=8)
 
@@ -46,9 +44,7 @@ def forecast(state: str):
     except:
         pass
 
-    # =========================
-    # TRY PROPHET
-    # =========================
+    
     try:
         future = model.make_future_dataframe(periods=8, freq='W')
         forecast = model.predict(future)
@@ -63,16 +59,14 @@ def forecast(state: str):
     except:
         pass
 
-    # =========================
-    # TRY XGBOOST (REAL FORECAST)
-    # =========================
+    
     try:
-        # Reload data
+        
         df = load_data(DATA_PATH)
         df = preprocess(df)
         df = fill_missing_dates(df)
 
-        # Filter state data
+        
         state_df = df[df['state'] == state]
 
         preds = forecast_xgb(model, state_df, steps=8)
