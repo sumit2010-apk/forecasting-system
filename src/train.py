@@ -27,9 +27,7 @@ for state in states:
 
     temp = df[df['state'] == state].copy()
 
-    # =========================
-    # ARIMA
-    # =========================
+
     series = temp.set_index('date')['total']
 
     arima_model = train_arima(series)
@@ -40,9 +38,7 @@ for state in states:
     arima_pred = arima_model.forecast(steps=len(test))
     arima_mae = evaluate(test, arima_pred)
 
-    # =========================
-    # PROPHET
-    # =========================
+    
     prophet_model = train_prophet(temp)
 
     prophet_forecast = forecast_prophet(prophet_model, len(test))
@@ -50,9 +46,7 @@ for state in states:
 
     prophet_mae = evaluate(test.values, prophet_pred)
 
-    # =========================
-    # XGBOOST
-    # =========================
+    
     feat_df = create_features(temp)
 
     X = feat_df.drop(columns=['total', 'state', 'date', 'category'], errors='ignore')
@@ -67,9 +61,7 @@ for state in states:
 
     xgb_mae = evaluate(y_test, xgb_pred)
 
-    # =========================
-    # COMPARE MODELS
-    # =========================
+    
     scores = {
         "ARIMA": arima_mae,
         "PROPHET": prophet_mae,
@@ -90,7 +82,7 @@ for state in states:
 
 print("\nFINAL RESULTS:")
 print(results)
-# Save best models
+
 pickle.dump(results, open("models.pkl", "wb"))
 
 print("\nModels saved successfully!")
