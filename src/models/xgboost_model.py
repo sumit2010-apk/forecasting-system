@@ -7,7 +7,7 @@ def forecast_xgb(model, df, steps=8):
     predictions = []
 
     for _ in range(steps):
-        # Create features
+        
         df['lag1'] = df['total'].shift(1)
         df['lag7'] = df['total'].shift(7)
         df['lag30'] = df['total'].shift(30)
@@ -20,16 +20,16 @@ def forecast_xgb(model, df, steps=8):
 
         df_feat = df.dropna().copy()
 
-        # Take last row as input
+        
         last_row = df_feat.iloc[-1:]
 
         X = last_row.drop(columns=['total', 'state', 'category'], errors='ignore')
 
-        # Predict
+        
         pred = model.predict(X)[0]
         predictions.append(pred)
 
-        # Add new predicted row
+        
         new_date = df.index[-1] + pd.Timedelta(weeks=1)
 
         new_row = pd.DataFrame({
